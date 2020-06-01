@@ -23,7 +23,7 @@ public class Controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private void OnMouseDown()
@@ -49,6 +49,6 @@ public class Controller : MonoBehaviour
         speed *= (magnitude * maxSpeed);
 
         Movement m = this.GetComponent<Movement>();
-        m.speed = speed;
+        m.Speed = speed;
     }
 }

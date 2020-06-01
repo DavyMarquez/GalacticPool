@@ -32,6 +32,14 @@ public class WormHole : MonoBehaviour
             OtherHole.passing.Add(obj);
 
             obj.transform.position = OtherHole.transform.position;
+
+            Movement mov = obj.GetComponent<Movement>();
+
+            float angle = OtherHole.transform.rotation.eulerAngles.z - 
+                transform.rotation.eulerAngles.z;
+
+            mov.Speed = Quaternion.AngleAxis(angle, Vector3.forward) * mov.Speed;
+
         }
     }
 
