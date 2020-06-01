@@ -67,34 +67,22 @@ public class Bounce : MonoBehaviour
 
             _newSpeed = new Vector2(0.0f, 0.0f);
 
-            // Assume the other ball is static 
-            Vector2 normal = other.contacts[0].normal;
-            if(!_movement.Speed.Equals(new Vector2(0.0f, 0.0f)))
-            {
-                float theta = Vector2.Angle(new Vector2(1.0f, 0.0f), normal); // in degrees
-                theta = Mathf.Deg2Rad * theta;
-                float newSpeedMag = _movement.Speed.magnitude *
-                    Mathf.Sqrt(mass * mass + bounce.Mass * bounce.Mass + 2 * mass * bounce.Mass * Mathf.Cos(theta)) /
-                    (mass + bounce.Mass);
+            float theta1 = Mathf.Atan2( _movement.Speed.normalized.y, _movement.Speed.normalized.x);
+            float theta2 = Mathf.Atan2(otherMovement.Speed.normalized.y, otherMovement.Speed.normalized.x);
+            float phi = Mathf.Atan2(other.gameObject.transform.position.y - gameObject.transform.position.y,
+                other.gameObject.transform.position.x - gameObject.transform.position.x);
+            float m1 = mass;
+            float m2 = bounce.Mass;
 
-                Vector3 normal3 = new Vector3(-normal.x, -normal.y, 0.0f);
-                _newSpeed = Vector3.Cross(normal3, new Vector3(0.0f, 0.0f, -1.0f)) * newSpeedMag;
-            }
-            
+            float v1 = _movement.Speed.magnitude;
+            float v2 = otherMovement.Speed.magnitude;
 
-            // Assume this ball is static
-            if (!otherMovement.Speed.Equals(new Vector2(0.0f, 0.0f)))
-            {
-                float theta = Vector2.Angle(new Vector2(1.0f, 0.0f), normal);
-                theta = Mathf.Deg2Rad * theta;
+            float vx1 = (v1 * Mathf.Cos(theta1 - phi) * (m1 - m2) + 2 * m2 * v2 * Mathf.Cos(theta2 - phi)) / 
+                (m1 + m2) * Mathf.Cos(phi) + v1 * Mathf.Sin(theta1 - phi) * Mathf.Cos(phi + Mathf.PI / 2);
+            float vy1 = (v1 * Mathf.Cos(theta1 - phi) * (m1 - m2) + 2 * m2 * v2 * Mathf.Cos(theta2 - phi)) 
+                / (m1 + m2) * Mathf.Sin(phi) + v1 * Mathf.Sin(theta1 - phi) * Mathf.Sin(phi + Mathf.PI / 2);
 
-                float newSpeedMag = otherMovement.Speed.magnitude * (2 * bounce.Mass / (bounce.Mass + mass)) *
-                    Mathf.Sin(theta / 2.0f);
-                Vector3 newDir = normal;
-                newDir.Normalize();
-                _newSpeed += new Vector2(newDir.x * newSpeedMag, newDir.y * newSpeedMag);
-                
-            }
+            _newSpeed = new Vector2(vx1, vy1);
 
             _collided = true;
 
