@@ -24,7 +24,7 @@ public class Movement : MonoBehaviour
         Vector2 newPos = new Vector2(transform.position.x, transform.position.y) + speed * Time.deltaTime;
         transform.position = new Vector3(newPos.x, newPos.y, 0.0f);
         
-        Vector3 start = transform.position;
+        Vector3 start = gameObject.transform.position;
         Vector3 dir = new Vector3(speed.normalized.x, speed.normalized.y, 0.0f);
         Vector3 end = start + dir * 1;  
         Debug.DrawLine(start, end, Color.red, 0.1f, true);

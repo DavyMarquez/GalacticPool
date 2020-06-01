@@ -9,6 +9,12 @@ public class Bounce : MonoBehaviour
     [Range(0, 1)]
     public float restitution = 1.0f;
 
+    public float Restitution
+    {
+        get { return restitution; }
+        set { restitution = value; }
+    }
+
     private Vector2 _newSpeed = new Vector2(0.0f, 0.0f);
 
     // Whether or not there is a collision
@@ -18,6 +24,12 @@ public class Bounce : MonoBehaviour
     private Movement _movement;
 
     public float mass = 1.0f;
+
+    public float Mass
+    {
+        get { return mass; }
+        set { mass = value; }
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -36,7 +48,7 @@ public class Bounce : MonoBehaviour
     {
         if (_movement && _collided)
         {
-            _movement.speed = _newSpeed * restitution;
+            _movement.Speed = _newSpeed * restitution;
             _collided = false;
         }
         
@@ -44,6 +56,7 @@ public class Bounce : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D other)
     {
+
         Assert.IsTrue(other.gameObject.tag == "Bounce", "No Bounce component on the game object");
         Bounce bounce = other.gameObject.GetComponent<Bounce>();
         if (bounce)
@@ -52,17 +65,36 @@ public class Bounce : MonoBehaviour
             Movement otherMovement = other.gameObject.GetComponent<Movement>();
             Assert.IsTrue(otherMovement, "The collided object does not have a Movement component");
 
+            _newSpeed = new Vector2(0.0f, 0.0f);
+
             // Assume the other ball is static 
             Vector2 normal = other.contacts[0].normal;
-            Vector2 speedDir = _movement.Speed.normalized;
-            float theta = Vector2.Angle(new Vector2(1.0f, 0.0f), normal); // in degrees
-            theta = Mathf.Deg2Rad * theta;
-            float phi1 = Mathf.Atan(bounce.mass * Mathf.Sin(theta));
-            float newSpeedMag = Mathf.Sqrt(mass * mass + bounce.mass * bounce.mass + 2 * mass * bounce.mass* Mathf.Cos(theta))
-                / (mass + bounce.mass);
+            if(!_movement.Speed.Equals(new Vector2(0.0f, 0.0f)))
+            {
+                float theta = Vector2.Angle(new Vector2(1.0f, 0.0f), normal); // in degrees
+                theta = Mathf.Deg2Rad * theta;
+                float newSpeedMag = _movement.Speed.magnitude *
+                    Mathf.Sqrt(mass * mass + bounce.Mass * bounce.Mass + 2 * mass * bounce.Mass * Mathf.Cos(theta)) /
+                    (mass + bounce.Mass);
 
-            _newSpeed = Quaternion.Euler(0, 0, 90.0f) * (-1.0f * normal * newSpeedMag);
-            Debug.Log(theta);
+                Vector3 normal3 = new Vector3(-normal.x, -normal.y, 0.0f);
+                _newSpeed = Vector3.Cross(normal3, new Vector3(0.0f, 0.0f, -1.0f)) * newSpeedMag;
+            }
+            
+
+            // Assume this ball is static
+            if (!otherMovement.Speed.Equals(new Vector2(0.0f, 0.0f)))
+            {
+                float theta = Vector2.Angle(new Vector2(1.0f, 0.0f), normal);
+                theta = Mathf.Deg2Rad * theta;
+
+                float newSpeedMag = otherMovement.Speed.magnitude * (2 * bounce.Mass / (bounce.Mass + mass)) *
+                    Mathf.Sin(theta / 2.0f);
+                Vector3 newDir = normal;
+                newDir.Normalize();
+                _newSpeed += new Vector2(newDir.x * newSpeedMag, newDir.y * newSpeedMag);
+                
+            }
 
             _collided = true;
 
