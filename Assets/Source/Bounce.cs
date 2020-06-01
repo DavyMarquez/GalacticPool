@@ -92,12 +92,12 @@ public class Bounce : MonoBehaviour
             
             // Change speed direction and magnitude based on perfect specular relexion and restitution factor
             Vector2 normal = other.contacts[0].normal;
-            Vector2 dir = -1.0f * _movement.speed;
+            Vector2 dir = -1.0f * _movement.Speed;
             dir.Normalize();
 
             Vector2 outDir = 2 * (Vector2.Dot(normal, dir)) * normal - dir;
             outDir.Normalize();
-            _newSpeed = outDir * _movement.speed.magnitude;
+            _newSpeed = outDir * _movement.Speed.magnitude;
             _collided = true;
         }
     }
