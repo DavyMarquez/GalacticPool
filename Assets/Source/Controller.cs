@@ -51,6 +51,7 @@ public class Controller : MonoBehaviour
             _mouseDownPos.z = 0.0f;
 
             _dragging = true;
+            
         }
         // Up, calculate the speed and add it to the object
         else if (Input.GetMouseButtonUp(0))
@@ -110,16 +111,7 @@ public class Controller : MonoBehaviour
 
             Vector2 aux = speed.normalized;
 
-            float sign = Vector2.Dot(aux, new Vector2(0, 1));
-
-            if(sign > 0)
-            {
-                sign = 1;
-            }
-            else
-            {
-                sign = -1;
-            }
+            float sign = Vector2.Dot(aux, new Vector2(0, 1)) > 0 ? 1 : -1;
 
             float angle = (float) (180.0 / Math.PI * 
                 Math.Acos(Vector2.Dot(aux, new Vector2(1, 0))));
@@ -132,6 +124,25 @@ public class Controller : MonoBehaviour
             _sr.color = Color.Lerp(Color.green, Color.red, magnitude);
 
             _sr.enabled = true;
+
+            
+            GetComponent<Predictor>().SimulateUpdate(20, 0.1f, speed);
+            
         }
     }
 }
+
+/*
+Component CopyComponent(Component original, GameObject destination)
+{
+    System.Type type = original.GetType();
+    Component copy = destination.AddComponent(type);
+    // Copied fields can be restricted with BindingFlags
+    System.Reflection.FieldInfo[] fields = type.GetFields();
+    foreach (System.Reflection.FieldInfo field in fields)
+    {
+        field.SetValue(copy, field.GetValue(original));
+    }
+    return copy;
+}
+*/
